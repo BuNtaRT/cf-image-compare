@@ -43,7 +43,34 @@ yarn build
 yarn start
 ```
 
+### Docker
+
+#### Quick Start
+```bash
+# Navigate to docker folder
+docker compose up -d
+# Note: The .env file is used for configuration
+```
+
 ## API Endpoints
+
+### GET /health
+Health check endpoint for monitoring.
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "uptime": 123.45,
+  "memory": {
+    "rss": 12345678,
+    "heapTotal": 9876543,
+    "heapUsed": 5432109,
+    "external": 123456
+  }
+}
+```
 
 ### POST /api/hash
 Computes pHash for an uploaded image.
