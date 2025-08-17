@@ -1,5 +1,5 @@
 {
-  "name": "picture-compare-api",
+  "name": "cf-image-compare-api",
   "version": "1.0.0",
   "description": "API для сравнения картинок с использованием pHash",
   "main": "dist/index.js",
