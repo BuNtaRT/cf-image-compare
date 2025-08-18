@@ -119,4 +119,69 @@ router.post("/compare", async (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
+/**
+ * POST /compare-batch - Compares one hash with an array of candidate hashes
+ */
+router.post("/compare-batch", async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { targetHash, candidateHashes, threshold = 10 } = req.body;
+
+    if (!targetHash || !candidateHashes) {
+      return res.status(400).json({
+        success: false,
+        error: "Target hash and candidate hashes array must be provided",
+      });
+    }
+
+    if (typeof targetHash !== "string") {
+      return res.status(400).json({
+        success: false,
+        error: "Target hash must be a string",
+      });
+    }
+
+    if (!Array.isArray(candidateHashes)) {
+      return res.status(400).json({
+        success: false,
+        error: "Candidate hashes must be an array",
+      });
+    }
+
+    if (candidateHashes.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Candidate hashes array cannot be empty",
+      });
+    }
+
+    if (!candidateHashes.every(hash => typeof hash === "string")) {
+      return res.status(400).json({
+        success: false,
+        error: "All candidate hashes must be strings",
+      });
+    }
+
+    if (Number.isNaN(threshold) || threshold < 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Threshold must be a positive number",
+      });
+    }
+
+    const results = imageService.compareHashWithCandidates(targetHash, candidateHashes, threshold);
+
+    res.json({
+      success: true,
+      results,
+      totalCandidates: candidateHashes.length,
+      validCandidates: results.length,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : "Internal server error",
+    });
+  }
+});
+
 export default router;

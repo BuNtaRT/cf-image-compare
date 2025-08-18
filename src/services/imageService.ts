@@ -19,6 +19,13 @@ export interface ImageComparisonResult {
   error?: string;
 }
 
+export interface BatchComparisonResult {
+  hash: string;
+  distance: number;
+  isSimilar: boolean;
+  similarity: number;
+}
+
 export class ImageService {
   /**
    * Computes pHash for an image
@@ -82,6 +89,35 @@ export class ImageService {
         error: error instanceof Error ? error.message : "Unknown error",
       };
     }
+  }
+
+  /**
+   * Compares one hash with an array of candidate hashes
+   * @param targetHash Hash to compare against
+   * @param candidateHashes Array of candidate hashes
+   * @param threshold Threshold for determining similarity
+   * @returns Array of comparison results
+   */
+  compareHashWithCandidates(
+    targetHash: string, 
+    candidateHashes: string[], 
+    threshold: number = 10
+  ): BatchComparisonResult[] {
+    if (!this.isValidHash(targetHash)) {
+      return [];
+    }
+
+    return candidateHashes
+      .filter(hash => this.isValidHash(hash))
+      .map(hash => {
+        const comparison = this.compareImageHashes(targetHash, hash, threshold);
+        return {
+          hash,
+          distance: comparison.distance,
+          isSimilar: comparison.isSimilar,
+          similarity: comparison.similarity,
+        };
+      });
   }
 
   /**
