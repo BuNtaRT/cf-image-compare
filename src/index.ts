@@ -30,7 +30,9 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     endpoints: {
       "POST /api/hash": "Computes pHash for an image",
+      "POST /api/hash-batch": "Computes pHash for multiple images",
       "POST /api/compare": "Compares two image hashes",
+      "POST /api/compare-batch": "Compares one hash with multiple candidate hashes",
     },
   });
 });

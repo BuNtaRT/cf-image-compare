@@ -109,6 +109,67 @@ Compares two image hashes.
 }
 ```
 
+### POST /api/hash-batch
+Computes pHash for multiple uploaded images.
+
+**Request:**
+- Content-Type: `multipart/form-data`
+- Parameter: `images` (array of image files, max 100 files)
+
+**Response:**
+```json
+{
+  "success": true,
+  "results": [
+    {
+      "filename": "image1.jpg",
+      "hash": "ff0a3b8c9d1e2f3a",
+      "success": true
+    },
+    {
+      "filename": "image2.jpg",
+      "hash": "ff0a3b8c9d1e2f3b",
+      "success": true
+    }
+  ],
+  "totalFiles": 2,
+  "successfulFiles": 2,
+  "failedFiles": 0
+}
+```
+
+### POST /api/compare-batch
+Compares one hash with an array of candidate hashes.
+
+**Request:**
+```json
+{
+  "targetHash": "ff0a3b8c9d1e2f3a",
+  "candidateHashes": [
+    "ff0a3b8c9d1e2f3b",
+    "ff0a3b8c9d1e2f3c"
+  ],
+  "threshold": 10
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "results": [
+    {
+      "hash": "ff0a3b8c9d1e2f3b",
+      "distance": 2,
+      "isSimilar": true,
+      "similarity": 0.98
+    }
+  ],
+  "totalCandidates": 2,
+  "validCandidates": 1
+}
+```
+
 ## Environment Variables
 
 | Variable | Description | Default | Example |

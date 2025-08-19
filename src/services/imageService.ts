@@ -26,6 +26,19 @@ export interface BatchComparisonResult {
   similarity: number;
 }
 
+export interface BatchHashResult {
+  success: boolean;
+  results: Array<{
+    filename: string;
+    hash: string;
+    success: boolean;
+    error?: string;
+  }>;
+  totalFiles: number;
+  successfulFiles: number;
+  failedFiles: number;
+}
+
 export class ImageService {
   /**
    * Computes pHash for an image
@@ -118,6 +131,56 @@ export class ImageService {
           similarity: comparison.similarity,
         };
       });
+  }
+
+  /**
+   * Computes pHash for multiple images
+   * @param files Array of files with buffer and filename
+   * @returns Batch result with hashes for all files
+   */
+  async calculateBatchImageHashes(files: Array<{ buffer: Buffer; filename: string }>): Promise<BatchHashResult> {
+    const results = [];
+    let successfulFiles = 0;
+    let failedFiles = 0;
+
+    for (const file of files) {
+      try {
+        const hashResult = await this.calculateImageHash(file.buffer);
+        
+        if (hashResult.success) {
+          results.push({
+            filename: file.filename,
+            hash: hashResult.hash,
+            success: true
+          });
+          successfulFiles++;
+        } else {
+          results.push({
+            filename: file.filename,
+            hash: '',
+            success: false,
+            error: hashResult.error
+          });
+          failedFiles++;
+        }
+      } catch (error) {
+        results.push({
+          filename: file.filename,
+          hash: '',
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+        failedFiles++;
+      }
+    }
+
+    return {
+      success: true,
+      results,
+      totalFiles: files.length,
+      successfulFiles,
+      failedFiles
+    };
   }
 
   /**
